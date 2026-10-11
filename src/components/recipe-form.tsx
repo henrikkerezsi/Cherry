@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Divider, IconButton, Text, TextInput } from 'react-native-paper';
-import type { BrewMethodId, GrindUnit, Recipe, StepKind } from '../models';
-import { BREW_METHOD_IDS, GRIND_UNITS, STEP_KIND_IDS } from '../models';
+import { Button, Divider, Text, TextInput } from 'react-native-paper';
+import type { BrewMethodId, GrindUnit, Recipe } from '../models';
+import { BREW_METHOD_IDS, GRIND_UNITS } from '../models';
 import type { RecipeInput, RecipeStepInput } from '../database/recipes';
 import { useAppData } from '../data/DataProvider';
 import { useAppTheme } from '../theme';
-import { GRIND_UNIT_LABELS, METHOD_LABELS, STEP_KIND_LABELS } from '../utils/labels';
+import { GRIND_UNIT_LABELS, METHOD_LABELS } from '../utils/labels';
 import { KeyboardAwareScrollView } from './keyboard-aware-scroll-view';
 import { NumberField } from './number-field';
 import { OptionField } from './option-field';
+import { StepListEditor } from './step-list-editor';
 
 interface RecipeFormProps {
   initial: Recipe | null;
@@ -22,27 +23,10 @@ const METHOD_OPTIONS = BREW_METHOD_IDS.map((value) => ({
   value,
   label: METHOD_LABELS[value],
 }));
-const STEP_KIND_OPTIONS = STEP_KIND_IDS.map((value) => ({
-  value,
-  label: STEP_KIND_LABELS[value],
-}));
 const GRIND_UNIT_OPTIONS = GRIND_UNITS.map((value) => ({
   value,
   label: GRIND_UNIT_LABELS[value],
 }));
-
-const EMPTY_STEP: RecipeStepInput = {
-  kind: null,
-  label: null,
-  targetWaterG: null,
-  pourWaterG: null,
-  pourDurationS: null,
-  waitAfterS: null,
-  agitationCount: null,
-  agitationKind: null,
-  temperatureC: null,
-  note: null,
-};
 
 export function RecipeForm({
   initial,
@@ -92,14 +76,6 @@ export function RecipeForm({
   const settingOptions = grindSettings
     .filter((setting) => grinderId === null || setting.brewerId === grinderId)
     .map((setting) => ({ value: setting.id, label: setting.name }));
-
-  const updateStep = (index: number, patch: Partial<RecipeStepInput>) => {
-    setSteps((current) =>
-      current.map((step, position) =>
-        position === index ? { ...step, ...patch } : step
-      )
-    );
-  };
 
   const handleSubmit = async () => {
     if (name.trim() === '') {
@@ -245,88 +221,7 @@ export function RecipeForm({
       <Text variant="titleSmall" style={styles.groupTitle}>
         Steps
       </Text>
-      {steps.map((step, index) => (
-        <Card key={index} mode="outlined" style={styles.stepCard}>
-          <Card.Content>
-            <View style={styles.stepHeader}>
-              <Text variant="labelLarge">Step {index + 1}</Text>
-              <IconButton
-                icon="delete-outline"
-                size={20}
-                accessibilityLabel={`Remove step ${index + 1}`}
-                onPress={() =>
-                  setSteps((current) => current.filter((_, position) => position !== index))
-                }
-              />
-            </View>
-            <OptionField<StepKind>
-              label="Kind"
-              value={step.kind}
-              options={STEP_KIND_OPTIONS}
-              onChange={(value) => updateStep(index, { kind: value })}
-              emptyLabel="Not set"
-            />
-            <TextInput
-              label="Label"
-              mode="outlined"
-              value={step.label ?? ''}
-              onChangeText={(text) => updateStep(index, { label: text || null })}
-              style={styles.field}
-            />
-            <View style={styles.grid}>
-              <View style={styles.gridItem}>
-                <NumberField
-                  label="Target water"
-                  value={step.targetWaterG}
-                  onChange={(value) => updateStep(index, { targetWaterG: value })}
-                  unit="g"
-                />
-              </View>
-              <View style={styles.gridItem}>
-                <NumberField
-                  label="Pour water"
-                  value={step.pourWaterG}
-                  onChange={(value) => updateStep(index, { pourWaterG: value })}
-                  unit="g"
-                />
-              </View>
-              <View style={styles.gridItem}>
-                <NumberField
-                  label="Pour time"
-                  value={step.pourDurationS}
-                  onChange={(value) => updateStep(index, { pourDurationS: value })}
-                  unit="s"
-                  integer
-                />
-              </View>
-              <View style={styles.gridItem}>
-                <NumberField
-                  label="Wait"
-                  value={step.waitAfterS}
-                  onChange={(value) => updateStep(index, { waitAfterS: value })}
-                  unit="s"
-                  integer
-                />
-              </View>
-            </View>
-            <TextInput
-              label="Note"
-              mode="outlined"
-              value={step.note ?? ''}
-              onChangeText={(text) => updateStep(index, { note: text || null })}
-              style={styles.field}
-            />
-          </Card.Content>
-        </Card>
-      ))}
-      <Button
-        mode="outlined"
-        icon="plus"
-        onPress={() => setSteps((current) => [...current, { ...EMPTY_STEP }])}
-        style={styles.addStep}
-      >
-        Add step
-      </Button>
+      <StepListEditor steps={steps} onChange={setSteps} />
 
       <Divider style={styles.divider} />
       <TextInput
@@ -378,17 +273,6 @@ const styles = StyleSheet.create({
   },
   groupTitle: {
     marginBottom: 10,
-  },
-  stepCard: {
-    marginBottom: 12,
-  },
-  stepHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  addStep: {
-    marginTop: 4,
   },
   submit: {
     marginTop: 24,

@@ -1,6 +1,6 @@
-# PassionFruit — AI-Assisted Coffee Brewing Journal
+# Cherry — AI-Assisted Coffee Brewing Journal
 
-PassionFruit is a private, local-first Android app for recording coffee brews,
+Cherry is a private, local-first Android app for recording coffee brews,
 learning from them, and being told what to try next. Its defining interaction is
 voice: you talk while you brew and while you drink, and a cloud model turns that
 ramble into a structured, queryable record.
@@ -8,7 +8,7 @@ ramble into a structured, queryable record.
 It is the sibling of **Coconut** (`../Coconut`), a personal budget app. The two
 share a family: the same Material Design 3 foundation, the same architecture, the
 same offline-first discipline, the same screen density, and the same way of
-turning a vague intention into a deliberate, judged event. PassionFruit is what
+turning a vague intention into a deliberate, judged event. Cherry is what
 happens when that design philosophy is pointed at coffee instead of money.
 
 Read `AGENTS.md` for how to build it. Read `theme.md` for how it looks. This
@@ -18,7 +18,7 @@ document defines what it is.
 
 ## 1. Purpose
 
-PassionFruit solves one problem: the user loves brewing coffee but almost never
+Cherry solves one problem: the user loves brewing coffee but almost never
 records what they did or how it turned out, so improvement is guesswork.
 
 The app exists to make recording a brew take less effort than not recording it,
@@ -40,7 +40,7 @@ system, and not a social network. One user, one device, one local database.
 
 ## 2. Design Lineage: Coconut
 
-PassionFruit and Coconut are the same family and must read that way to anyone who
+Cherry and Coconut are the same family and must read that way to anyone who
 uses both.
 
 ### 2.1 What is shared
@@ -55,7 +55,7 @@ uses both.
 - The same evolution of the domain over time: a numbered migration list, never
   editing a shipped migration.
 - The same "a record is a deliberate event" idea. Coconut refuses to invent a
-  month; PassionFruit refuses to invent a brew.
+  month; Cherry refuses to invent a brew.
 - The same five-tab bottom bar with a custom `CustomTabBar`.
 - The same reusable component vocabulary: `StatCard`, `AppDialog`, `EmptyState`,
   `ScreenFade`, `FadeIn`, `AnimatedNumber`, `LoadingScreen`,
@@ -66,27 +66,27 @@ uses both.
 ### 2.2 What is deliberately different
 
 - **Colour.** Coconut is shell brown, sage and dusty blue on warm cream.
-  PassionFruit is passion-fruit orange and berry magenta, with deep teal and
-  golden amber (`theme.md` §4, §5).
+  Cherry is roasted coffee-brown and coffee-cherry red, on an oat-beige paper,
+  with green-tea teal and caramel amber (`theme.md` §4, §5).
 - **The fifth tab.** Coconut's tabs are Overview, Transactions, Statistics,
-  Shared, Settings. PassionFruit's are Brew, Log, Explore, Learn, Settings, plus
+  Shared, Settings. Cherry's are Overview, Log, Equipment, Learn, Settings, plus
   a persistent microphone FAB that Coconut has no equivalent of.
 - **A network dependency exists, and it is allowed.** Coconut makes zero network
-  requests unless the user opts into sync. PassionFruit requires a cloud AI
+  requests unless the user opts into sync. Cherry requires a cloud AI
   provider for its signature feature. It is still local-first and still works
   fully without AI — see §5.7 — but the honest difference is stated here.
-- **There is no month.** Coconut's period is a calendar month. PassionFruit's
+- **There is no month.** Coconut's period is a calendar month. Cherry's
   period is a **brew**, which is a much shorter, much more narrative unit.
 - **No sync in v1** (§13.6). Coconut has Supabase sync and Shared Spaces; those
-  come later for PassionFruit, once the brew schema has stabilised.
+  come later for Cherry, once the brew schema has stabilised.
 
 ### 2.3 What is borrowed as an idea, not as code
 
 Coconut's `RatingSelector` (regret / neutral / good on a three-stop track)
-becomes PassionFruit's taste rating, widened to a 1–5 scale with a 3 midpoint.
+becomes Cherry's taste rating, widened to a 1–5 scale with a 3 midpoint.
 Coconut's "judge each transaction at month close" becomes "judge each brew at
 taste time". Coconut's offline reserve reserve of `month_budget_plan_events`
-becomes PassionFruit's `plan_events`, an audited record of every deliberate
+becomes Cherry's `plan_events`, an audited record of every deliberate
 change to a plan.
 
 ---
@@ -94,7 +94,7 @@ change to a plan.
 ## 3. The Core Model: A Brew Has a Lifecycle
 
 Coconut's strongest design decision is that a month is planned, judged, and
-closed — it does not simply pass. PassionFruit applies the same idea to a brew.
+closed — it does not simply pass. Cherry applies the same idea to a brew.
 
 ### 3.1 Plan
 
@@ -256,7 +256,7 @@ per-device, stored in `settings`.
 
 **There is no local inference. None.** No on-device model, no GGUF file, no
 llama.cpp, no MediaPipe, no LiteRT, no bundled weights. Every AI operation in
-PassionFruit is a network call to a provider the user has configured.
+Cherry is a network call to a provider the user has configured.
 
 This is a deliberate, explicit constraint. It keeps the APK small, the build
 simple, and the emulator usable for UI work. It is also the single largest
@@ -421,7 +421,7 @@ rather than disabling it.
 
 Learning from the user's own brews is necessary but not sufficient. A beginner can
 repeat the same avoidable mistake fifty times and the model will only learn that
-the mistake is "their style". PassionFruit therefore lets the user ask for
+the mistake is "their style". Cherry therefore lets the user ask for
 external help directly, and lets the engine act on an obvious flaw before it
 spends dozens of brews discovering it empirically.
 
@@ -482,7 +482,7 @@ answer is stored, with the advice text in its notes.
 
 ## 6. Coffee: The Bean Catalogue
 
-PassionFruit maintains a full catalogue of the coffee itself. This is where the
+Cherry maintains a full catalogue of the coffee itself. This is where the
 strongest preference signal lives: it is far more useful to learn "you prefer
 washed Ethiopian light roasts at 1:16" than "you pressed a button 40 times".
 
@@ -577,7 +577,7 @@ non-goal for v1 (§23).
 
 ### 8.1 The nine methods
 
-PassionFruit natively supports exactly these nine, each with its own structured
+Cherry natively supports exactly these nine, each with its own structured
 recipe shape:
 
 ```
@@ -1072,7 +1072,7 @@ is always history-anchored where history exists.
 ### 11.7 Flaw-first priority
 
 A recommender that only ever explores within the space the user has already
-visited will happily tune a fundamentally broken technique. PassionFruit makes
+visited will happily tune a fundamentally broken technique. Cherry makes
 one exception to explore-versus-exploit: if an **obvious flaw** is present, the
 engine corrects it first, in every mode, before it proposes anything else.
 
@@ -1247,7 +1247,7 @@ follows Coconut's additive pattern (uuid + updated_at on every sync-facing table
 then outbox/tombstone tables) in a later numbered migration. Because every table
 already carries `uuid` and `updated_at` from migration 1, that retrofit is cheap.
 This is a deliberate difference from Coconut, where the sync columns were added
-in migration 7: PassionFruit pays the small schema cost up front so the door stays
+in migration 7: Cherry pays the small schema cost up front so the door stays
 open.
 
 ### 13.2 Conventions
@@ -1302,11 +1302,12 @@ Any of these found as a stored column, in any table, is a bug.
 Five tabs and one persistent action. Every tab is reachable at all times,
 including with no provider configured and no data.
 
-### Brew (home)
+### Overview (home)
 
-The default tab. Top to bottom:
+The default tab, rendered without a top bar so the background reaches the top of
+the screen and the brand row leads. Top to bottom:
 
-- A brand row: the PassionFruit logo glyph and wordmark, matching Coconut's
+- A brand row: the Cherry logo glyph and wordmark, matching Coconut's
   Overview brand row.
 - A **Next up** card. Either the current recommendation (with its mode chip and
   one-line rationale) or, if none exists, a prompt to brew. Tapping opens the
@@ -1576,7 +1577,7 @@ web app:
 
 ## 20. Design Philosophy
 
-PassionFruit is a focused personal tool, not a commercial coffee platform, not a
+Cherry is a focused personal tool, not a commercial coffee platform, not a
 smart-home hub, and not a social app. In priority order:
 
 1. Recording a brew must be faster than not recording it, or the app has failed.
@@ -1600,7 +1601,7 @@ better cup than yesterday.
 ## 21. Project Structure
 
 ```
-PassionFruit/
+Cherry/
 ├── AGENTS.md            conventions and rules for AI agents
 ├── README.md            public-facing overview
 ├── idea.txt             this file: the product and architecture spec
@@ -1625,7 +1626,7 @@ document, not a shared artifact.
 
 ## 22. Release Process
 
-PassionFruit follows Coconut's release shape so the two are maintained the same
+Cherry follows Coconut's release shape so the two are maintained the same
 way:
 
 - A `scripts/update-version.js` bumps `app.json`'s `expo.version` and
@@ -1633,10 +1634,10 @@ way:
   `versionCode` is a monotonic integer independent of the semver string.
 - A `release.sh` validates a clean git tree, runs unit tests and the type check,
   builds a release APK with `./gradlew assembleRelease`, and **renames the Gradle
-  artifact `app-release.apk` to `passionfruit.apk`** in the same output directory.
+  artifact `app-release.apk` to `cherry.apk`** in the same output directory.
   It commits `app.json` and `release-info.ts`, tags `v<version>`, pushes, and
   prints the `gh release create` command. The released file is always named
-  `passionfruit.apk`, mirroring Coconut's `coconut.apk`, never `app-release.apk`.
+  `cherry.apk`, mirroring Coconut's `coconut.apk`, never `app-release.apk`.
 - Every release adds a `whats-new.ts` entry and a `release-plan.md` section.
 - Build numbers are never reused and never decremented.
 

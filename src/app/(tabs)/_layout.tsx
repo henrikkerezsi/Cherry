@@ -19,9 +19,9 @@ export default function TabsLayout() {
         }}
         tabBar={(props) => <CustomTabBar {...props} />}
       >
-        <Tabs.Screen name="index" options={{ title: 'Brew' }} />
+        <Tabs.Screen name="index" options={{ title: 'Overview', headerShown: false }} />
         <Tabs.Screen name="log" options={{ title: 'Log' }} />
-        <Tabs.Screen name="explore" options={{ title: 'Explore' }} />
+        <Tabs.Screen name="equipment" options={{ title: 'Equipment' }} />
         <Tabs.Screen name="learn" options={{ title: 'Learn' }} />
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Card, Divider, List, Text } from 'react-native-paper';
+import { Card, Divider, Text } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScreenFade } from '../../components/screen-fade';
 import { KeyboardAwareScrollView } from '../../components/keyboard-aware-scroll-view';
@@ -131,12 +131,6 @@ export default function MethodDetailScreen() {
             </Card>
           </>
         ) : null}
-
-        <List.Item
-          title="Explore recipes with this method"
-          left={(props) => <List.Icon {...props} icon="compass-outline" />}
-          onPress={() => router.push('/(tabs)/explore')}
-        />
       </KeyboardAwareScrollView>
     </ScreenFade>
   );

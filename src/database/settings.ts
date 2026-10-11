@@ -14,6 +14,7 @@ export const DEFAULT_SETTINGS: Settings = {
   lowBeanThresholdG: 30,
   tutorialSeen: false,
   lastSeenRelease: null,
+  aiAutoAccept: false,
 };
 
 type SettingsKey =
@@ -26,7 +27,8 @@ type SettingsKey =
   | 'bean_freshness_warning_days'
   | 'low_bean_threshold_g'
   | 'tutorial_seen'
-  | 'last_seen_release';
+  | 'last_seen_release'
+  | 'ai_auto_accept';
 
 const SETTINGS_KEY_MAP: Record<keyof Settings, SettingsKey> = {
   themeMode: 'theme_mode',
@@ -39,6 +41,7 @@ const SETTINGS_KEY_MAP: Record<keyof Settings, SettingsKey> = {
   lowBeanThresholdG: 'low_bean_threshold_g',
   tutorialSeen: 'tutorial_seen',
   lastSeenRelease: 'last_seen_release',
+  aiAutoAccept: 'ai_auto_accept',
 };
 
 function clampInt(value: number, min: number, max: number, fallback: number): number {
@@ -117,6 +120,9 @@ function rowToSettings(rows: { key: SettingsKey; value: string }[]): Settings {
         break;
       case 'last_seen_release':
         settings.lastSeenRelease = row.value === '' ? null : row.value;
+        break;
+      case 'ai_auto_accept':
+        settings.aiAutoAccept = row.value === '1' || row.value === 'true';
         break;
     }
   }

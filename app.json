@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "PassionFruit",
-    "slug": "passionfruit",
+    "name": "Cherry",
+    "slug": "cherry",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "passionfruit",
+    "scheme": "cherry",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#FDF7F2",
+        "backgroundColor": "#F6F0E6",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.passionfruit.app",
+      "package": "com.cherry.app",
       "minSdkVersion": 29,
       "predictiveBackGestureEnabled": false,
       "versionCode": 1
@@ -32,7 +32,14 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "PassionFruit uses the microphone to record your brew sessions."
+          "microphonePermission": "Cherry uses the microphone to record your brew sessions."
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Cherry uses the microphone to record your brew sessions.",
+          "speechRecognitionPermission": "Cherry transcribes what you say so your brew can be logged from your voice."
         }
       ],
       [
@@ -41,7 +48,7 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#FDF7F2"
+          "backgroundColor": "#F6F0E6"
         }
       ]
     ],

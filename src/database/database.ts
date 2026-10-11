@@ -23,6 +23,17 @@ export async function closeDatabase(): Promise<void> {
   }
 }
 
+/**
+ * Reopens the database, which is what a restore needs: the file underneath the
+ * open handle has been replaced, and a restored backup may predate the newest
+ * migration, so reopening also runs any pending migrations.
+ */
+export async function resetDatabase(): Promise<void> {
+  await closeDatabase();
+  dbPromise = getDatabase();
+  await dbPromise;
+}
+
 export async function migrate(db: SQLiteDatabase): Promise<void> {
   const row = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
   const currentVersion = row?.user_version ?? 0;

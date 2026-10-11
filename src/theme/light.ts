@@ -1,4 +1,4 @@
 import { lightColors } from './tokens/colors';
-import { buildPassionFruitTheme } from './theme';
+import { buildCherryTheme } from './theme';
 
-export const lightTheme = buildPassionFruitTheme(lightColors, 'light');
+export const lightTheme = buildCherryTheme(lightColors, 'light');

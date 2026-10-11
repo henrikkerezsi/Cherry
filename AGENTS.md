@@ -1,6 +1,6 @@
-# AGENTS.md — PassionFruit Coding Conventions
+# AGENTS.md — Cherry Coding Conventions
 
-This file is the single source of truth for AI agents working on PassionFruit.
+This file is the single source of truth for AI agents working on Cherry.
 Read `idea.txt` for the full product and architecture specification.
 Read `theme.md` for every design token and component-theming rule.
 
@@ -11,7 +11,7 @@ seems to require breaking a rule in this file, stop and ask first.
 
 ## 1. Project Overview
 
-PassionFruit is a private, local-first Android app for recording coffee brews by
+Cherry is a private, local-first Android app for recording coffee brews by
 voice, extracting a structured record from the transcript with a cloud LLM,
 tracking what the coffee tasted like, and recommending what to brew next with a
 deterministic learning engine.
@@ -116,8 +116,8 @@ Never run, suggest, recommend, or fall back to any of the following:
 - `adb emu kill` (kills the emulator process)
 - `adb emu avd name` / any AVD deletion
 - `emulator -avd <name> -wipe-data` (the `-wipe-data` flag)
-- `adb shell pm clear com.passionfruit.app` (clears app data)
-- `adb uninstall com.passionfruit.app`
+- `adb shell pm clear com.cherry.app` (clears app data)
+- `adb uninstall com.cherry.app`
 - Deleting or re-creating the AVD via Android Studio / Device Manager
 - Any "reset emulator", "cold boot", or "wipe app data" button in an IDE or GUI
 - Deleting the emulator's userdata directory from disk
@@ -146,7 +146,7 @@ the emulator.
 ```
 src/
 ├── app/           # Expo Router screens and layouts (file-based routing)
-│   ├── (tabs)/    # brew, log, explore, learn, settings
+│   ├── (tabs)/    # overview, log, equipment, learn, settings
 │   └── _layout.tsx
 ├── components/    # Reusable UI components (React Native Paper based)
 ├── database/      # SQLite schema, migrations, and data-access layer

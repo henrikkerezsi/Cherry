@@ -1,17 +1,17 @@
-# PassionFruit — Theme Specification
+# Cherry — Theme Specification
 
-This document defines every design token and every themed surface in PassionFruit.
+This document defines every design token and every themed surface in Cherry.
 It is the single source of truth for the app's appearance. Implement it in
 `src/theme/` exactly as specified; do not invent colours, sizes or radii.
 
 Theme tokens are consumed through `useAppTheme()`. Raw hex values must never be
-written inline in a component — see `AGENTS.md` §7.
+written inline in a component — see `AGENTS.md` §10.
 
 ---
 
 ## 1. Design Lineage
 
-PassionFruit is a sibling of **Coconut** (`../Coconut`). The two are one family.
+Cherry is a sibling of **Coconut** (`../Coconut`). The two are one family.
 
 What is borrowed **unchanged** from Coconut:
 
@@ -27,8 +27,9 @@ What is borrowed **unchanged** from Coconut:
 What is deliberately **different**:
 
 - The colour values. Coconut is coconut-shell brown, sage green and dusty blue
-  on a warm cream. PassionFruit is passion-fruit orange and berry magenta, with a
-  deep teal and a golden amber as the third and fourth brand scales.
+  on a warm cream. Cherry is a coffee-cherry theme: a deep roasted coffee-brown
+  primary and a ripe coffee-cherry red secondary, on an oat-beige paper, with a
+  muted green-tea teal and a caramel amber as the third and fourth brand scales.
 - Every colour in this document is contrast-verified to WCAG 2.1 AA. Coconut is
   not; see §8.
 
@@ -38,11 +39,11 @@ What is deliberately **different**:
 
 ```
 src/theme/
-├── index.tsx        # PassionFruitThemeProvider, useAppTheme()
-├── types.ts         # PassionFruitTheme, ThemeMode, ThemePreference, BrandTokens
-├── theme.ts         # buildPassionFruitTheme(raw, scheme)
-├── light.ts         # lightTheme = buildPassionFruitTheme(lightColors, 'light')
-├── dark.ts          # darkTheme  = buildPassionFruitTheme(darkColors,  'dark')
+├── index.tsx        # CherryThemeProvider, useAppTheme()
+├── types.ts         # CherryTheme, ThemeMode, ThemePreference, BrandTokens
+├── theme.ts         # buildCherryTheme(raw, scheme)
+├── light.ts         # lightTheme = buildCherryTheme(lightColors, 'light')
+├── dark.ts          # darkTheme  = buildCherryTheme(darkColors,  'dark')
 ├── fonts.ts         # buildFontScale()
 ├── semantic.ts      # buildSemanticColors(tokens, onAccent)
 ├── navigation.ts    # buildNavigationTheme(theme)
@@ -71,10 +72,10 @@ ColorTokens
 │               surfaceHover, surfacePressed, elevation1..elevation5
 ├── borders   : border, borderStrong, borderSubtle
 ├── text      : primary, secondary, tertiary, disabled, onAccent
-├── primary   : BrandScale   # passion-fruit orange
-├── secondary : BrandScale   # berry magenta
-├── water     : BrandScale   # deep teal
-├── warm      : BrandScale   # golden amber
+├── primary   : BrandScale   # roasted coffee brown
+├── secondary : BrandScale   # coffee-cherry red
+├── water     : BrandScale   # green-tea teal
+├── warm      : BrandScale   # caramel amber
 └── semantic  : success/successLight/successBorder,
                 warning/warningLight/warningBorder,
                 error/errorLight/errorBorder/onErrorContainer,
@@ -84,8 +85,8 @@ BrandScale = { base, hover, pressed, light, muted }
 ```
 
 The names `water` and `warm` are kept from Coconut on purpose so that a reader
-with Coconut open in another window is never confused. In PassionFruit, `water`
-is the cool counterweight to the orange and `warm` is the golden highlight.
+with Coconut open in another window is never confused. In Cherry, `water`
+is the cool counterweight to the brown and `warm` is the caramel highlight.
 
 ### Brand scale semantics
 
@@ -103,43 +104,44 @@ is the cool counterweight to the orange and `warm` is the golden highlight.
 
 ### 4.1 Surfaces
 
-A pale peach-cream. Deliberately close in temperature to Coconut's `#F7F4EC` so
-the two apps read as the same product, but with a visible warm-pink cast.
+An oat-beige paper. Deliberately close in temperature to Coconut's `#F7F4EC` so
+the two apps read as the same product, but with a visible warm-brown, kiln-dried
+cast.
 
 | Token | Value |
 | --- | --- |
-| `background` | `#FDF7F2` |
-| `surface` | `#FFFCFA` |
-| `surfaceSecondary` | `#F7EFE8` |
-| `surfaceTertiary` | `#EFE3D8` |
-| `surfaceHover` | `#FAF2EB` |
-| `surfacePressed` | `#EADCD0` |
-| `elevation1` | `#FCF6F1` |
-| `elevation2` | `#FAF2EB` |
-| `elevation3` | `#F7EDE4` |
-| `elevation4` | `#F4E8DE` |
-| `elevation5` | `#F1E3D8` |
+| `background` | `#F6F0E6` |
+| `surface` | `#FCF9F3` |
+| `surfaceSecondary` | `#EFE7DA` |
+| `surfaceTertiary` | `#E6DAC8` |
+| `surfaceHover` | `#F3ECE1` |
+| `surfacePressed` | `#E1D3BF` |
+| `elevation1` | `#FAF5EC` |
+| `elevation2` | `#F6F0E6` |
+| `elevation3` | `#F2EBDE` |
+| `elevation4` | `#EEE5D5` |
+| `elevation5` | `#EADFCC` |
 
-`elevation1..5` must each be a hair lighter than the one before it. Verify this
+`elevation1..5` must each be a hair darker than the one before it. Verify this
 before committing any change to a single elevation value.
 
 ### 4.2 Borders
 
 | Token | Value |
 | --- | --- |
-| `border` | `#E7D8C9` |
-| `borderStrong` | `#D2BCA7` |
-| `borderSubtle` | `#F0E5DA` |
+| `border` | `#E2D3BE` |
+| `borderStrong` | `#CBB79C` |
+| `borderSubtle` | `#EDE3D5` |
 
 ### 4.3 Text
 
 | Token | Value | Contrast on `surface` |
 | --- | --- | --- |
-| `primary` | `#2B2018` | 15.54 |
-| `secondary` | `#665348` | 7.10 |
-| `tertiary` | `#826C5F` | 4.83 |
-| `disabled` | `#AFA093` | 2.19 |
-| `onAccent` | `#FFFCFA` | — |
+| `primary` | `#2A211A` | 15.02 |
+| `secondary` | `#5C4E42` | 7.62 |
+| `tertiary` | `#7A6A5B` | 4.95 |
+| `disabled` | `#A99B8C` | 2.58 |
+| `onAccent` | `#FFFDF9` | — |
 
 `disabled` is below 4.5 by design and is used only for genuinely disabled
 controls, which WCAG 1.4.3 explicitly exempts.
@@ -148,19 +150,19 @@ controls, which WCAG 1.4.3 explicitly exempts.
 
 | Scale | `base` | `hover` | `pressed` | `light` | `muted` |
 | --- | --- | --- | --- | --- | --- |
-| `primary` (orange) | `#B0501D` | `#9B461A` | `#863D16` | `#F4E4DB` | `#E4C2AF` |
-| `secondary` (magenta) | `#A62F6B` | `#92295E` | `#7E2451` | `#F3DFE6` | `#E1B6C9` |
-| `water` (teal) | `#2C766C` | `#27685F` | `#215A52` | `#E1E9E6` | `#B7CECA` |
-| `warm` (amber) | `#8A631F` | `#79551B` | `#694819` | `#EFE7DC` | `#D9C9B1` |
+| `primary` (coffee) | `#6B4A33` | `#5C3F2B` | `#4D3423` | `#EDE1D3` | `#CEB69E` |
+| `secondary` (cherry) | `#9C2B34` | `#8A252D` | `#781F26` | `#F3DEDE` | `#DCB0B2` |
+| `water` (teal) | `#2F6A60` | `#295D54` | `#234F48` | `#DFE9E6` | `#B2CBC6` |
+| `warm` (caramel) | `#8A5A16` | `#794E13` | `#694210` | `#EFE4D4` | `#D9C3A0` |
 
 Contrast of each `base` against `surface` / `background` / `surfaceSecondary`:
 
 | Scale | on `surface` | on `background` | on `surfaceSecondary` |
 | --- | --- | --- | --- |
-| `primary` | 5.12 | 4.93 | 4.60 |
-| `secondary` | 6.34 | 6.10 | 5.70 |
-| `water` | 5.25 | 5.05 | 4.72 |
-| `warm` | 4.98 | 4.78 | 4.51 |
+| `primary` | 7.53 | 6.98 | 6.45 |
+| `secondary` | 7.11 | 6.60 | 6.09 |
+| `water` | 5.96 | 5.53 | 5.11 |
+| `warm` | 5.62 | 5.21 | 4.81 |
 
 All four clear 4.5:1 on all three surface tiers.
 
@@ -168,18 +170,18 @@ All four clear 4.5:1 on all three surface tiers.
 
 | Token | Value | on `surface` |
 | --- | --- | --- |
-| `success` | `#4C7A52` | 4.88 |
-| `successLight` | `#EAECE6` | — |
-| `successBorder` | `#C6D2C3` | — |
-| `warning` | `#96631A` | 5.02 |
-| `warningLight` | `#F2EADF` | — |
-| `warningBorder` | `#DFCDA8` | — |
-| `error` | `#B33F45` | 5.54 |
-| `errorLight` | `#F6E5E4` | — |
-| `errorBorder` | `#E7C0BE` | — |
-| `onErrorContainer` | `#6E2026` | — |
-| `info` | `#3F6E86` | 5.43 |
-| `infoLight` | `#E8EBEC` | — |
+| `success` | `#4C7A52` | 4.74 |
+| `successLight` | `#E9ECE2` | — |
+| `successBorder` | `#C4D0BF` | — |
+| `warning` | `#8A5A16` | 5.62 |
+| `warningLight` | `#F1E8D9` | — |
+| `warningBorder` | `#DECBA6` | — |
+| `error` | `#A8323A` | 6.28 |
+| `errorLight` | `#F5E3E3` | — |
+| `errorBorder` | `#E5BEBD` | — |
+| `onErrorContainer` | `#6E1B22` | — |
+| `info` | `#3F6E86` | 5.28 |
+| `infoLight` | `#E6EBEC` | — |
 | `infoBorder` | `#C0CFD5` | — |
 
 ---
@@ -188,46 +190,47 @@ All four clear 4.5:1 on all three surface tiers.
 
 ### 5.1 Surfaces
 
-A warm charcoal with a faint cocoa-red cast. Structure mirrors Coconut's
-(`#181612` → `#211D18` → `#29241E` → `#332D25`), shifted one step warmer.
+A warm espresso-grounds charcoal with a faint cocoa-red cast. Structure mirrors
+Coconut's (`#181612` → `#211D18` → `#29241E` → `#332D25`), shifted one step
+warmer.
 
 | Token | Value |
 | --- | --- |
-| `background` | `#191310` |
-| `surface` | `#221B17` |
-| `surfaceSecondary` | `#2A221C` |
-| `surfaceTertiary` | `#342A23` |
-| `surfaceHover` | `#2E251F` |
-| `surfacePressed` | `#392F27` |
-| `elevation1` | `#241D18` |
-| `elevation2` | `#27201A` |
-| `elevation3` | `#2B231C` |
-| `elevation4` | `#2F271F` |
-| `elevation5` | `#332B22` |
+| `background` | `#171310` |
+| `surface` | `#201A15` |
+| `surfaceSecondary` | `#28211B` |
+| `surfaceTertiary` | `#322921` |
+| `surfaceHover` | `#2C251E` |
+| `surfacePressed` | `#372E25` |
+| `elevation1` | `#221C16` |
+| `elevation2` | `#251F18` |
+| `elevation3` | `#29221B` |
+| `elevation4` | `#2D261E` |
+| `elevation5` | `#312A21` |
 
 ### 5.2 Borders
 
 | Token | Value |
 | --- | --- |
-| `border` | `#40352C` |
-| `borderStrong` | `#524538` |
-| `borderSubtle` | `#362C25` |
+| `border` | `#3E332A` |
+| `borderStrong` | `#504336` |
+| `borderSubtle` | `#342B23` |
 
 ### 5.3 Text
 
 | Token | Value | Contrast on `surface` |
 | --- | --- | --- |
-| `primary` | `#F8F0E8` | 15.05 |
-| `secondary` | `#CABCB0` | 9.16 |
-| `tertiary` | `#9E8D7F` | 5.31 |
-| `disabled` | `#6E6258` | 2.86 |
-| `onAccent` | `#191310` | — |
+| `primary` | `#F7EFE6` | 15.12 |
+| `secondary` | `#C8B9AB` | 9.00 |
+| `tertiary` | `#9C8A7B` | 5.19 |
+| `disabled` | `#6C6055` | 2.82 |
+| `onAccent` | `#171310` | — |
 
 > **Note.** `onAccent` is the *dark background colour* in dark mode, not a
 > near-white. Coconut sets `onAccent` to `#FFFDF8` in both schemes, which gives
 > `onPrimary`-on-`primary` a contrast of only 2.59 in its dark scheme. Because
-> PassionFruit's brand `base` values are light in dark mode, the on-colour must
-> be dark. Do not "fix" this back to a near-white.
+> Cherry's brand `base` values are light in dark mode, the on-colour must be
+> dark. Do not "fix" this back to a near-white.
 
 ### 5.4 Brand scales
 
@@ -237,29 +240,29 @@ shells. Identical transformation to Coconut, different values.
 
 | Scale | `base` | `hover` | `pressed` | `light` | `muted` |
 | --- | --- | --- | --- | --- | --- |
-| `primary` (orange) | `#F0A175` | `#F2AC86` | `#F0A378` | `#402D22` | `#6B4936` |
-| `secondary` (magenta) | `#E08BB4` | `#E499BD` | `#E18DB6` | `#3D292E` | `#65414E` |
-| `water` (teal) | `#7CC4BA` | `#8CCBC2` | `#7FC5BB` | `#2B332F` | `#3F5651` |
-| `warm` (amber) | `#E5B45C` | `#E8BD70` | `#E6B65F` | `#3E301E` | `#67502D` |
+| `primary` (coffee) | `#D9A57C` | `#DEB08B` | `#DAA67E` | `#3D2C20` | `#664934` |
+| `secondary` (cherry) | `#DF8A8E` | `#E39699` | `#E08C90` | `#3C2627` | `#643E40` |
+| `water` (teal) | `#79C3B6` | `#88CABE` | `#7CC4B8` | `#29322E` | `#3D5550` |
+| `warm` (caramel) | `#DEB061` | `#E2B974` | `#DFB264` | `#3D2F1C` | `#644D2A` |
 
-Contrast of each `base` against `surface`: 8.13 / 6.89 / 8.46 / 8.90.
-Contrast of `onAccent` (`#191310`) against each `base`: 8.81 / 7.46 / 9.16 / 9.65.
+Contrast of each `base` against `surface`: 7.89 / 6.69 / 8.44 / 8.60.
+Contrast of `onAccent` (`#171310`) against each `base`: 8.46 / 7.18 / 9.05 / 9.22.
 
 ### 5.5 Semantic
 
 | Token | Value | on `surface` |
 | --- | --- | --- |
-| `success` | `#7DBE86` | 7.74 |
-| `successLight` | `#282D22` | — |
-| `successBorder` | `#40523E` | — |
-| `warning` | `#DFAE5E` | 8.37 |
-| `warningLight` | `#372A1C` | — |
+| `success` | `#7DBE86` | 7.85 |
+| `successLight` | `#272D22` | — |
+| `successBorder` | `#3F523E` | — |
+| `warning` | `#DFAE5E` | 8.49 |
+| `warningLight` | `#362A1C` | — |
 | `warningBorder` | `#65502E` | — |
-| `error` | `#E2817D` | 6.20 |
-| `errorLight` | `#372420` | — |
+| `error` | `#E2817D` | 6.29 |
+| `errorLight` | `#362420` | — |
 | `errorBorder` | `#6A3D38` | — |
 | `onErrorContainer` | `#F6BDB8` | — |
-| `info` | `#8BBEDA` | 8.47 |
+| `info` | `#8BBEDA` | 8.59 |
 | `infoLight` | `#2A2D2E` | — |
 | `infoBorder` | `#3F5866` | — |
 
@@ -267,7 +270,7 @@ Contrast of `onAccent` (`#191310`) against each `base`: 8.81 / 7.46 / 9.16 / 9.6
 
 ## 6. MD3 Mapping
 
-`buildPassionFruitTheme` maps the raw tokens onto `MD3Colors` exactly as Coconut
+`buildCherryTheme` maps the raw tokens onto `MD3Colors` exactly as Coconut
 does, with one change:
 
 ```
@@ -285,7 +288,7 @@ inverseSurface   = light ? primary.pressed : surfaces.background
 inverseOnSurface = light ? text.onAccent : text.primary
 inversePrimary   = light ? primary.muted : primary.pressed
 shadow/scrim     = #000000
-backdrop         = light ? 'rgba(43,32,24,0.5)' : 'rgba(0,0,0,0.7)'
+backdrop         = light ? 'rgba(42,33,26,0.5)' : 'rgba(0,0,0,0.7)'
 elevation.level0..5 = 'transparent' + surfaces.elevation1..5
 ```
 
@@ -308,44 +311,44 @@ Return object additionally carries: `scheme`, `brand`, `surfaces`, `borders`,
 
 ## 7. Chart Palette
 
-Coconut has one `chartPalette`. PassionFruit has two, because a single bright
+Coconut has one `chartPalette`. Cherry has two, because a single bright
 set cannot clear 3:1 against a near-white surface without collapsing the
 perceptual gaps between series.
 
 ```
 tokens/chart.ts
-├── chartPaletteLight  # marks on cream surfaces
-├── chartPaletteDark   # marks on charcoal surfaces
+├── chartPaletteLight  # marks on oat-beige surfaces
+├── chartPaletteDark   # marks on espresso surfaces
 └── type ChartColor
 ```
 
 `buildTheme` picks by scheme; `theme.chart` is always a `readonly string[]` of 8.
 
-**Light series** (all ≥ 4.37:1 on `#FFFCFA`):
+**Light series** (all ≥ 5.62:1 on `#FCF9F3`):
 
 | # | Hex | Reads as |
 | --- | --- | --- |
-| 1 | `#C0392B` | Ember |
-| 2 | `#B06500` | Burnt amber |
-| 3 | `#6F7A00` | Olive gold |
-| 4 | `#2F7D28` | Leaf |
-| 5 | `#0F7B6E` | Teal |
-| 6 | `#2A5CC4` | Sky |
-| 7 | `#8439A8` | Violet |
-| 8 | `#B3126A` | Berry |
+| 1 | `#8C4A2F` | Coffee |
+| 2 | `#A8323A` | Coffee cherry |
+| 3 | `#8A5A16` | Caramel |
+| 4 | `#4C6B2E` | Matcha |
+| 5 | `#2F6A60` | Teal |
+| 6 | `#3A5A8C` | Slate |
+| 7 | `#6B3A7A` | Plum |
+| 8 | `#9C3B5A` | Rose |
 
-**Dark series** (all ≥ 5.95:1 on `#221B17`):
+**Dark series** (all ≥ 7.26:1 on `#201A15`):
 
 | # | Hex |
 | --- | --- |
-| 1 | `#FF7A66` |
-| 2 | `#F0A33C` |
-| 3 | `#C6CE3A` |
-| 4 | `#5FC94F` |
-| 5 | `#35CFC0` |
-| 6 | `#6FA0FF` |
-| 7 | `#C17BF0` |
-| 8 | `#F06CB0` |
+| 1 | `#E39A6B` |
+| 2 | `#EE8E8E` |
+| 3 | `#E0B25C` |
+| 4 | `#9CCB6B` |
+| 5 | `#6FD0BE` |
+| 6 | `#85A8F0` |
+| 7 | `#C79AE8` |
+| 8 | `#F08CB4` |
 
 **Rules for charts.** A chart that distinguishes series by colour alone is not
 acceptable (WCAG 1.4.1). Every multi-series chart must additionally encode series
@@ -367,7 +370,7 @@ combinations.
 
 Coconut's palette, for comparison, currently fails AA on five light-mode pairs —
 `water` 2.88, `warm` 3.07, `text.tertiary` 4.12, `warning` 3.93, `info` 4.32 —
-and on `onAccent`-on-`primary` in dark mode at 2.59. PassionFruit does not
+and on `onAccent`-on-`primary` in dark mode at 2.59. Cherry does not
 inherit these. Do not copy a colour across from Coconut without re-checking it.
 
 Re-verify with a throwaway script before committing any change:
@@ -484,7 +487,7 @@ info,    infoContainer,    onInfo,    infoBorder
 overBudget, goodBudget, delete, deleteContainer
 ```
 
-PassionFruit renames the last four to match its domain while keeping the fields:
+Cherry renames the last four to match its domain while keeping the fields:
 
 ```
 sour,       sourContainer,   onSour,   sourBorder     // a negative extraction verdict
@@ -532,9 +535,9 @@ reusing one of these for a different meaning is a bug:
 
 | Meaning | Icon |
 | --- | --- |
-| Brew tab | `coffee-outline` |
+| Overview tab | `home-outline` |
 | Log tab | `notebook-outline` |
-| Explore tab | `compass-outline` |
+| Equipment tab | `coffee-maker-outline` |
 | Learn tab | `chart-line` |
 | Settings tab | `cog-outline` |
 | Microphone, idle | `microphone-outline` |

@@ -9,6 +9,7 @@ import React, {
 import type {
   AiState,
   Bean,
+  Brew,
   Brewer,
   FlavourTag,
   GrindSetting,
@@ -16,6 +17,7 @@ import type {
   Recipe,
   Roaster,
   Settings,
+  Tasting,
 } from '../models';
 import { getDatabase } from '../database/database';
 import {
@@ -68,6 +70,20 @@ import {
 import type { RecipeInput } from '../database/recipes';
 import { getAllMethods } from '../database/methods';
 import { addOtherFlavourTag, getAllFlavourTags } from '../database/flavourTags';
+import {
+  createBrew,
+  deleteBrew,
+  getAllBrews,
+  updateBrew,
+} from '../database/brews';
+import type { BrewInput } from '../database/brews';
+import {
+  createTasting,
+  deleteTasting,
+  getAllTastings,
+  updateTasting,
+} from '../database/tastings';
+import type { TastingInput } from '../database/tastings';
 
 export interface AppData {
   ready: boolean;
@@ -81,6 +97,8 @@ export interface AppData {
   methods: Method[];
   recipes: Recipe[];
   flavourTags: FlavourTag[];
+  brews: Brew[];
+  tastings: Tasting[];
   refresh: () => Promise<void>;
   saveSettings: (patch: Partial<Settings>) => Promise<void>;
   saveAiState: (patch: Partial<AiState>) => Promise<void>;
@@ -104,6 +122,12 @@ export interface AppData {
   removeRecipe: (id: number) => Promise<void>;
   adoptRecipe: (builtinId: number) => Promise<number>;
   addFlavourTag: (name: string) => Promise<string>;
+  addBrew: (input: BrewInput) => Promise<number>;
+  saveBrew: (id: number, input: BrewInput) => Promise<void>;
+  removeBrew: (id: number) => Promise<void>;
+  addTasting: (input: TastingInput) => Promise<number>;
+  saveTasting: (id: number, input: TastingInput) => Promise<void>;
+  removeTasting: (id: number) => Promise<void>;
 }
 
 const DataContext = createContext<AppData | null>(null);
@@ -133,6 +157,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [methods, setMethods] = useState<Method[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [flavourTags, setFlavourTags] = useState<FlavourTag[]>([]);
+  const [brews, setBrews] = useState<Brew[]>([]);
+  const [tastings, setTastings] = useState<Tasting[]>([]);
 
   const refresh = useCallback(async () => {
     try {
@@ -147,6 +173,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         nextMethods,
         nextRecipes,
         nextFlavourTags,
+        nextBrews,
+        nextTastings,
       ] = await Promise.all([
         getSettings(db),
         getAiState(db),
@@ -157,6 +185,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         getAllMethods(db),
         getAllRecipes(db),
         getAllFlavourTags(db),
+        getAllBrews(db),
+        getAllTastings(db),
       ]);
       setSettings(nextSettings);
       setAiState(nextAiState);
@@ -167,6 +197,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       setMethods(nextMethods);
       setRecipes(nextRecipes);
       setFlavourTags(nextFlavourTags);
+      setBrews(nextBrews);
+      setTastings(nextTastings);
       setError(null);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Failed to load local data');
@@ -218,6 +250,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       methods,
       recipes,
       flavourTags,
+      brews,
+      tastings,
       refresh,
       saveSettings,
       saveAiState,
@@ -324,6 +358,48 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         await refresh();
         return id;
       },
+      addBrew: async (input) => {
+        const db = await getDatabase();
+        const id = await createBrew(input, db);
+        if (input.beanId !== null && input.doseG !== null) {
+          const bean = beans.find((candidate) => candidate.id === input.beanId);
+          if (bean && bean.isActive && bean.remainingWeightG !== null) {
+            await setBeanRemainingWeight(
+              bean.id,
+              Math.max(0, bean.remainingWeightG - input.doseG),
+              db
+            );
+          }
+        }
+        await refresh();
+        return id;
+      },
+      saveBrew: async (id, input) => {
+        const db = await getDatabase();
+        await updateBrew(id, input, db);
+        await refresh();
+      },
+      removeBrew: async (id) => {
+        const db = await getDatabase();
+        await deleteBrew(id, db);
+        await refresh();
+      },
+      addTasting: async (input) => {
+        const db = await getDatabase();
+        const id = await createTasting(input, db);
+        await refresh();
+        return id;
+      },
+      saveTasting: async (id, input) => {
+        const db = await getDatabase();
+        await updateTasting(id, input, db);
+        await refresh();
+      },
+      removeTasting: async (id) => {
+        const db = await getDatabase();
+        await deleteTasting(id, db);
+        await refresh();
+      },
     }),
     [
       ready,
@@ -337,6 +413,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       methods,
       recipes,
       flavourTags,
+      brews,
+      tastings,
       refresh,
       saveSettings,
       saveAiState,

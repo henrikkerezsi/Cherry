@@ -7,9 +7,9 @@ import type { ComponentProps } from 'react';
 import { useAppTheme } from '../theme';
 
 const TAB_ICONS: Record<string, ComponentProps<typeof MaterialCommunityIcons>['name']> = {
-  index: 'coffee-maker-outline',
+  index: 'home-outline',
   log: 'notebook-outline',
-  explore: 'compass-outline',
+  equipment: 'coffee-maker-outline',
   learn: 'lightbulb-outline',
   settings: 'cog-outline',
 };

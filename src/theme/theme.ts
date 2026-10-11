@@ -11,12 +11,12 @@ import {
 } from './tokens';
 import { buildSemanticColors } from './semantic';
 import { buildFontScale } from './fonts';
-import type { PassionFruitTheme, ThemeMode } from './types';
+import type { CherryTheme, ThemeMode } from './types';
 
-export function buildPassionFruitTheme(
+export function buildCherryTheme(
   raw: ColorTokens,
   scheme: ThemeMode
-): PassionFruitTheme {
+): CherryTheme {
   const base = scheme === 'light' ? MD3LightTheme : MD3DarkTheme;
   const onContainerText = scheme === 'light' ? raw.primary.pressed : raw.text.primary;
 
@@ -52,7 +52,7 @@ export function buildPassionFruitTheme(
     inversePrimary: scheme === 'light' ? raw.primary.muted : raw.primary.pressed,
     shadow: '#000000',
     scrim: '#000000',
-    backdrop: scheme === 'light' ? 'rgba(43,32,24,0.5)' : 'rgba(0,0,0,0.7)',
+    backdrop: scheme === 'light' ? 'rgba(42,33,26,0.5)' : 'rgba(0,0,0,0.7)',
     elevation: {
       level0: 'transparent',
       level1: raw.surfaces.elevation1,

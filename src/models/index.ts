@@ -184,6 +184,7 @@ export interface Settings {
   lowBeanThresholdG: number;
   tutorialSeen: boolean;
   lastSeenRelease: string | null;
+  aiAutoAccept: boolean;
 }
 
 export interface AiState {

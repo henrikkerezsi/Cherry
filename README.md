@@ -1,7 +1,7 @@
-# PassionFruit
+# Cherry
 
 <p align="center">
-  <img src="assets/passionfruit-banner.jpg" alt="PassionFruit — a private, local-first coffee brewing journal" width="640">
+  <img src="assets/cherry-banner.jpg" alt="Cherry — a private, local-first coffee brewing journal" width="640">
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
 
 ## About
 
-PassionFruit is a personal coffee brewing journal, not a social network or a
+Cherry is a personal coffee brewing journal, not a social network or a
 cloud service. You plan a brew, talk through it while you make it, record how it
 tasted, and the app gradually learns how the knobs you control — dose, water,
 temperature, grind, pour structure — affect the result in the cup.

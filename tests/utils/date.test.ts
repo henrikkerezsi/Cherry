@@ -1,8 +1,11 @@
 import {
+  dateToTimestamp,
   daysBetween,
   durationLabel,
   elapsedLabel,
   isIsoDate,
+  startOfWeekDate,
+  timestampDate,
   todayDate,
 } from '../../src/utils/date';
 
@@ -29,6 +32,28 @@ describe('daysBetween', () => {
 
   it('is negative when the second date is earlier', () => {
     expect(daysBetween('2026-10-03', '2026-10-01')).toBe(-2);
+  });
+});
+
+describe('startOfWeekDate', () => {
+  it('snaps back to the Sunday of that week', () => {
+    expect(startOfWeekDate('2026-10-07')).toBe('2026-10-04');
+  });
+
+  it('leaves a Sunday on its own day', () => {
+    expect(startOfWeekDate('2026-10-04')).toBe('2026-10-04');
+  });
+});
+
+describe('dateToTimestamp', () => {
+  it('anchors a date at midday UTC', () => {
+    expect(dateToTimestamp('2026-10-02')).toBe('2026-10-02T12:00:00.000Z');
+  });
+});
+
+describe('timestampDate', () => {
+  it('reads the calendar date back off a timestamp', () => {
+    expect(timestampDate('2026-10-02T12:00:00.000Z')).toBe('2026-10-02');
   });
 });
 

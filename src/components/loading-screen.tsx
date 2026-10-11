@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
-import { PassionFruitLogo } from './passionfruit-logo';
+import { CherryLogo } from './cherry-logo';
 
 export function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <PassionFruitLogo size={56} />
+      <CherryLogo size={56} />
       <Text variant="bodyMedium" style={styles.label}>
-        PassionFruit
+        Cherry
       </Text>
       <ActivityIndicator size="small" style={styles.spinner} />
     </View>

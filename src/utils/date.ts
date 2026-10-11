@@ -1,8 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 
-export const DATABASE_NAME = 'passionfruit.db';
+export const DATABASE_NAME = 'cherry.db';
 
-export const BACKUP_EXTENSION = 'fruit';
+export const BACKUP_EXTENSION = 'cherry';
 
 export const STORE_DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -18,6 +18,19 @@ export function todayDate(now?: string | Dayjs | Date): string {
 
 export function isIsoDate(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+export function startOfWeekDate(now?: string | Dayjs | Date): string {
+  return dayjs(now ?? dayjs()).startOf('week').format(STORE_DATE_FORMAT);
+}
+
+// Midday UTC keeps a recorded date readable as the same day in every timezone.
+export function dateToTimestamp(isoDate: string): string {
+  return `${isoDate}T12:00:00.000Z`;
+}
+
+export function timestampDate(isoTimestamp: string): string {
+  return dayjs(isoTimestamp).format(STORE_DATE_FORMAT);
 }
 
 export function dayLabel(isoDate: string): string {

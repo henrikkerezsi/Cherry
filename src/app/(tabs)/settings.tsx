@@ -10,7 +10,8 @@ import { useAppData } from '../../data/DataProvider';
 import { useAppTheme } from '../../theme';
 import { BREW_METHOD_IDS } from '../../models';
 import type { BrewMethodId, ThemeMode } from '../../models';
-import { BREWER_KIND_LABELS, METHOD_LABELS } from '../../utils/labels';
+import { releaseInfo } from '../../config/release-info';
+import { METHOD_LABELS } from '../../utils/labels';
 
 const METHOD_OPTIONS = BREW_METHOD_IDS.map((value) => ({
   value,
@@ -18,14 +19,7 @@ const METHOD_OPTIONS = BREW_METHOD_IDS.map((value) => ({
 }));
 
 export default function SettingsScreen() {
-  const {
-    settings,
-    aiState,
-    roasters,
-    brewers,
-    grindSettings,
-    saveSettings,
-  } = useAppData();
+  const { settings, aiState, roasters, saveSettings } = useAppData();
   const theme = useAppTheme();
 
   return (
@@ -110,62 +104,6 @@ export default function SettingsScreen() {
         <Divider style={styles.divider} />
 
         <Text variant="titleMedium" style={styles.section}>
-          Equipment
-        </Text>
-        {brewers.length === 0 ? (
-          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-            No equipment yet.
-          </Text>
-        ) : (
-          brewers.map((brewer) => (
-            <List.Item
-              key={brewer.id}
-              title={brewer.name}
-              description={BREWER_KIND_LABELS[brewer.kind]}
-              left={(props) => <List.Icon {...props} icon="coffee-maker-outline" />}
-              onPress={() => router.push(`/brewer/${brewer.id}`)}
-            />
-          ))
-        )}
-        <Button
-          mode="outlined"
-          icon="plus"
-          onPress={() => router.push('/brewer/new')}
-          style={styles.addButton}
-        >
-          Add equipment
-        </Button>
-
-        <Text variant="titleSmall" style={styles.subhead}>
-          Grind settings
-        </Text>
-        {grindSettings.length === 0 ? (
-          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-            No grind settings yet.
-          </Text>
-        ) : (
-          grindSettings.map((setting) => (
-            <List.Item
-              key={setting.id}
-              title={setting.name}
-              description={setting.selectionLabel ?? 'No selection label'}
-              left={(props) => <List.Icon {...props} icon="tune" />}
-              onPress={() => router.push(`/grinder/${setting.id}`)}
-            />
-          ))
-        )}
-        <Button
-          mode="outlined"
-          icon="plus"
-          onPress={() => router.push('/grinder/new')}
-          style={styles.addButton}
-        >
-          Add grind setting
-        </Button>
-
-        <Divider style={styles.divider} />
-
-        <Text variant="titleMedium" style={styles.section}>
           Recording
         </Text>
         <List.Item
@@ -201,12 +139,55 @@ export default function SettingsScreen() {
           AI provider
         </Text>
         <List.Item
-          title="Status"
+          title="Provider and keys"
           description={
             aiState.enabled
               ? 'A provider is configured. Credentials are stored only on this device.'
               : 'Not configured. The app works fully offline without it.'
           }
+          left={(props) => <List.Icon {...props} icon="brain" />}
+          onPress={() => router.push('/ai-provider')}
+          testID="settings-ai-provider"
+        />
+
+        <Divider style={styles.divider} />
+
+        <Text variant="titleMedium" style={styles.section}>
+          Data
+        </Text>
+        <List.Item
+          title="Backup and restore"
+          description="Export the whole database as one file, or restore from one."
+          left={(props) => <List.Icon {...props} icon="database-export-outline" />}
+          onPress={() => router.push('/backup')}
+          testID="settings-backup"
+        />
+
+        <Divider style={styles.divider} />
+
+        <Text variant="titleMedium" style={styles.section}>
+          Help
+        </Text>
+        <List.Item
+          title="Tour"
+          description="What Cherry does, and how it stays private."
+          left={(props) => <List.Icon {...props} icon="compass-outline" />}
+          onPress={() => router.push('/tutorial')}
+          testID="settings-tutorial"
+        />
+        <List.Item
+          title="What's new"
+          description={`Version ${releaseInfo.version}`}
+          left={(props) => <List.Icon {...props} icon="star-four-points" />}
+          onPress={() => router.push('/whats-new')}
+          testID="settings-whats-new"
+        />
+        <List.Item
+          title="About"
+          description="Version, privacy and source."
+          left={(props) => <List.Icon {...props} icon="information-outline" />}
+          onPress={() => router.push('/about')}
+          testID="settings-about"
         />
         <View style={styles.spacer} />
       </KeyboardAwareScrollView>

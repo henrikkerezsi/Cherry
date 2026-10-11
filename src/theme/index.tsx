@@ -2,11 +2,11 @@ import React, { createContext, useContext, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 import { lightTheme } from './light';
 import { darkTheme } from './dark';
-import type { PassionFruitTheme, ThemeMode, ThemePreference } from './types';
+import type { CherryTheme, ThemeMode, ThemePreference } from './types';
 
-const ThemeContext = createContext<PassionFruitTheme>(lightTheme);
+const ThemeContext = createContext<CherryTheme>(lightTheme);
 
-export function PassionFruitThemeProvider({
+export function CherryThemeProvider({
   preference = 'system',
   children,
 }: {
@@ -20,9 +20,9 @@ export function PassionFruitThemeProvider({
   return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;
 }
 
-export function useAppTheme(): PassionFruitTheme {
+export function useAppTheme(): CherryTheme {
   return useContext(ThemeContext);
 }
 
 export { lightTheme, darkTheme };
-export type { PassionFruitTheme, ThemeMode, ThemePreference, ThemeColors, BrandTokens } from './types';
+export type { CherryTheme, ThemeMode, ThemePreference, ThemeColors, BrandTokens } from './types';

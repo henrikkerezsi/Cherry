@@ -1,8 +1,8 @@
 import type { Theme } from 'expo-router';
 import { DarkTheme, DefaultTheme } from 'expo-router';
-import type { PassionFruitTheme } from './types';
+import type { CherryTheme } from './types';
 
-export function buildNavigationTheme(theme: PassionFruitTheme): Theme {
+export function buildNavigationTheme(theme: CherryTheme): Theme {
   const base = theme.scheme === 'dark' ? DarkTheme : DefaultTheme;
 
   return {

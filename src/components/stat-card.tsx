@@ -1,0 +1,82 @@
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Card, Text } from 'react-native-paper';
+import { useAppTheme } from '../theme';
+import { AnimatedNumber } from './animated-number';
+
+export type Tone = 'neutral' | 'good' | 'bad' | 'attention';
+
+interface StatCardProps {
+  label: string;
+  value: number | null;
+  format: (value: number) => string;
+  sub?: string | null;
+  tone?: Tone;
+}
+
+/**
+ * A tile is absent rather than zero when there is no data, so a null value
+ * renders as an em-dash instead of a misleading 0 (idea.txt §14).
+ */
+export function StatCard({ label, value, format, sub, tone = 'neutral' }: StatCardProps) {
+  const theme = useAppTheme();
+  const TONE_COLORS: Record<Tone, string> = {
+    neutral: theme.colors.onSurfaceVariant,
+    good: theme.semantic.sweet,
+    bad: theme.semantic.sour,
+    attention: theme.semantic.warning,
+  };
+  const color = TONE_COLORS[tone];
+
+  return (
+    <Card mode="contained" style={styles.card}>
+      <Card.Content style={styles.content}>
+        <Text variant="labelMedium" style={styles.label}>
+          {label}
+        </Text>
+        {value === null ? (
+          <Text variant="headlineSmall" style={{ color }}>
+            —
+          </Text>
+        ) : (
+          <AnimatedNumber value={value} format={format} style={[styles.value, { color }]} />
+        )}
+        {sub ? (
+          <Text variant="bodySmall" style={styles.sub}>
+            {sub}
+          </Text>
+        ) : null}
+      </Card.Content>
+    </Card>
+  );
+}
+
+export function StatCardRow({ children }: { children: React.ReactNode }) {
+  return <View style={styles.row}>{children}</View>;
+}
+
+const styles = StyleSheet.create({
+  card: {
+    flex: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  label: {
+    opacity: 0.7,
+    marginBottom: 2,
+  },
+  value: {
+    fontSize: 28,
+    lineHeight: 36,
+  },
+  sub: {
+    opacity: 0.6,
+    marginTop: 2,
+  },
+});

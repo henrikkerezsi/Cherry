@@ -1,14 +1,14 @@
 import React from 'react';
 import { Image, type ImageStyle, type StyleProp } from 'react-native';
 
-const logo = require('../../assets/passionfruit-logo.jpg');
+const logo = require('../../assets/cherry-logo.jpg');
 
-interface PassionFruitLogoProps {
+interface CherryLogoProps {
   size?: number;
   style?: StyleProp<ImageStyle>;
 }
 
-export function PassionFruitLogo({ size = 40, style }: PassionFruitLogoProps) {
+export function CherryLogo({ size = 40, style }: CherryLogoProps) {
   return (
     <Image
       source={logo}

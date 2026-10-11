@@ -23,7 +23,7 @@ export interface BrandTokens {
   readonly warm: BrandScale;
 }
 
-export type PassionFruitTheme = Omit<MD3Theme, 'colors'> & {
+export type CherryTheme = Omit<MD3Theme, 'colors'> & {
   readonly scheme: ThemeMode;
   readonly colors: ThemeColors;
   readonly brand: BrandTokens;

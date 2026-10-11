@@ -1,23 +1,23 @@
 export const chartPaletteLight: readonly string[] = [
-  '#C0392B',
-  '#B06500',
-  '#6F7A00',
-  '#2F7D28',
-  '#0F7B6E',
-  '#2A5CC4',
-  '#8439A8',
-  '#B3126A',
+  '#8C4A2F',
+  '#A8323A',
+  '#8A5A16',
+  '#4C6B2E',
+  '#2F6A60',
+  '#3A5A8C',
+  '#6B3A7A',
+  '#9C3B5A',
 ];
 
 export const chartPaletteDark: readonly string[] = [
-  '#FF7A66',
-  '#F0A33C',
-  '#C6CE3A',
-  '#5FC94F',
-  '#35CFC0',
-  '#6FA0FF',
-  '#C17BF0',
-  '#F06CB0',
+  '#E39A6B',
+  '#EE8E8E',
+  '#E0B25C',
+  '#9CCB6B',
+  '#6FD0BE',
+  '#85A8F0',
+  '#C79AE8',
+  '#F08CB4',
 ];
 
 export type ChartColor =
