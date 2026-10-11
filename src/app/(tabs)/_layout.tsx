@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { CustomTabBar } from '../../components/custom-tab-bar';
 import { MicFab } from '../../components/mic-fab';
@@ -6,6 +6,8 @@ import { useAppTheme } from '../../theme';
 
 export default function TabsLayout() {
   const theme = useAppTheme();
+  const pathname = usePathname();
+  const showMicFab = pathname === '/' || pathname === '/log';
 
   return (
     <View style={styles.container}>
@@ -25,7 +27,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="learn" options={{ title: 'Learn' }} />
         <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
       </Tabs>
-      <MicFab bottomOffset={64} />
+      {showMicFab ? <MicFab bottomOffset={64} /> : null}
     </View>
   );
 }

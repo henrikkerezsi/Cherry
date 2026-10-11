@@ -1,7 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { router, Stack } from 'expo-router';
-import { Chip, List, Searchbar, Text } from 'react-native-paper';
+import {
+  Button,
+  List,
+  Modal,
+  Portal,
+  RadioButton,
+  Searchbar,
+  Text,
+} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScreenFade } from '../../components/screen-fade';
 import { KeyboardAwareScrollView } from '../../components/keyboard-aware-scroll-view';
@@ -13,15 +21,23 @@ import { BREW_METHOD_IDS } from '../../models';
 import { METHOD_LABELS } from '../../utils/labels';
 import { dayLabel } from '../../utils/date';
 import { primaryRating } from '../../services/tasting-service';
+import { availableMethods } from '../../services/equipment-service';
 
 const MIN_RATING_OPTIONS = [3, 4, 5] as const;
+const ALL_METHODS = 'all' as const;
 
 export default function LogScreen() {
   const theme = useAppTheme();
-  const { brews, tastings } = useAppData();
+  const { brews, tastings, brewers, methods } = useAppData();
   const [query, setQuery] = useState('');
   const [methodFilter, setMethodFilter] = useState<BrewMethodId | null>(null);
   const [minRating, setMinRating] = useState<number | null>(null);
+  const [filterVisible, setFilterVisible] = useState(false);
+
+  const availableMethodIds = useMemo(
+    () => availableMethods(brewers, methods).map((method) => method.id),
+    [brewers, methods]
+  );
 
   const ratingByBrew = useMemo(() => {
     const map = new Map<number, number | null>();
@@ -74,6 +90,18 @@ export default function LogScreen() {
     return result;
   }, [filtered]);
 
+  const activeFilterCount =
+    (methodFilter === null ? 0 : 1) + (minRating === null ? 0 : 1);
+  const resultCount =
+    filtered.length === brews.length
+      ? `${brews.length} brews`
+      : `${filtered.length} of ${brews.length} brews`;
+
+  const clearFilters = () => {
+    setMethodFilter(null);
+    setMinRating(null);
+  };
+
   return (
     <ScreenFade>
       <Stack.Screen options={{ title: 'Log' }} />
@@ -87,55 +115,45 @@ export default function LogScreen() {
           style={styles.search}
         />
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chips}
-        >
-          <Chip
-            selected={methodFilter === null}
-            onPress={() => setMethodFilter(null)}
-            style={styles.chip}
+        <View style={styles.controls}>
+          <Button
+            mode="outlined"
+            compact
+            icon="filter-variant"
+            onPress={() => setFilterVisible(true)}
+            accessibilityLabel={
+              activeFilterCount > 0
+                ? `Filter, ${activeFilterCount} active`
+                : 'Filter brew list'
+            }
           >
-            All methods
-          </Chip>
-          {BREW_METHOD_IDS.map((methodId) => (
-            <Chip
-              key={methodId}
-              selected={methodFilter === methodId}
-              onPress={() =>
-                setMethodFilter(methodFilter === methodId ? null : methodId)
-              }
-              style={styles.chip}
+            {activeFilterCount > 0 ? `Filter · ${activeFilterCount}` : 'Filter'}
+          </Button>
+          {activeFilterCount > 0 ? (
+            <Button
+              mode="text"
+              compact
+              onPress={clearFilters}
+              accessibilityLabel="Clear all filters"
             >
-              {METHOD_LABELS[methodId]}
-            </Chip>
-          ))}
-        </ScrollView>
+              Clear
+            </Button>
+          ) : null}
+          <Text variant="labelMedium" style={styles.count}>
+            {resultCount}
+          </Text>
+        </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chips}
-        >
-          <Chip
-            selected={minRating === null}
-            onPress={() => setMinRating(null)}
-            style={styles.chip}
-          >
-            Any rating
-          </Chip>
-          {MIN_RATING_OPTIONS.map((option) => (
-            <Chip
-              key={option}
-              selected={minRating === option}
-              onPress={() => setMinRating(minRating === option ? null : option)}
-              style={styles.chip}
-            >
-              {`${option}+`}
-            </Chip>
-          ))}
-        </ScrollView>
+        <FilterModal
+          visible={filterVisible}
+          methodFilter={methodFilter}
+          minRating={minRating}
+          availableMethodIds={availableMethodIds}
+          onMethodChange={setMethodFilter}
+          onRatingChange={setMinRating}
+          onClear={clearFilters}
+          onClose={() => setFilterVisible(false)}
+        />
 
         {groups.length === 0 ? (
           <EmptyState
@@ -175,6 +193,101 @@ export default function LogScreen() {
   );
 }
 
+interface FilterModalProps {
+  visible: boolean;
+  methodFilter: BrewMethodId | null;
+  minRating: number | null;
+  availableMethodIds: BrewMethodId[];
+  onMethodChange: (method: BrewMethodId | null) => void;
+  onRatingChange: (rating: number | null) => void;
+  onClear: () => void;
+  onClose: () => void;
+}
+
+function FilterModal({
+  visible,
+  methodFilter,
+  minRating,
+  availableMethodIds,
+  onMethodChange,
+  onRatingChange,
+  onClear,
+  onClose,
+}: FilterModalProps) {
+  const theme = useAppTheme();
+
+  return (
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={onClose}
+        contentContainerStyle={[
+          styles.modal,
+          {
+            backgroundColor: theme.colors.surface,
+            borderRadius: theme.radii.large,
+            padding: theme.spacing[5],
+            marginHorizontal: theme.spacing[4],
+          },
+        ]}
+      >
+        <Text variant="titleMedium" style={styles.modalTitle}>
+          Filter
+        </Text>
+        <ScrollView style={styles.modalBody}>
+          <Text variant="labelLarge" style={styles.sectionLabel}>
+            Method
+          </Text>
+          <RadioButton.Group
+            value={methodFilter === null ? ALL_METHODS : methodFilter}
+            onValueChange={(value) =>
+              onMethodChange(value === ALL_METHODS ? null : (value as BrewMethodId))
+            }
+          >
+            <RadioButton.Item label="Any method" value={ALL_METHODS} />
+            {BREW_METHOD_IDS.filter(
+              (id) => availableMethodIds.includes(id) || id === methodFilter
+            ).map((methodId) => (
+              <RadioButton.Item
+                key={methodId}
+                label={METHOD_LABELS[methodId]}
+                value={methodId}
+              />
+            ))}
+          </RadioButton.Group>
+
+          <Text variant="labelLarge" style={styles.sectionLabel}>
+            Minimum rating
+          </Text>
+          <RadioButton.Group
+            value={minRating === null ? 'any' : String(minRating)}
+            onValueChange={(value) =>
+              onRatingChange(value === 'any' ? null : Number(value))
+            }
+          >
+            <RadioButton.Item label="Any rating" value="any" />
+            {MIN_RATING_OPTIONS.map((option) => (
+              <RadioButton.Item
+                key={option}
+                label={`${option} stars or more`}
+                value={String(option)}
+              />
+            ))}
+          </RadioButton.Group>
+        </ScrollView>
+        <View style={styles.modalActions}>
+          <Button mode="text" onPress={onClear} accessibilityLabel="Clear all filters">
+            Clear
+          </Button>
+          <Button mode="contained" onPress={onClose} accessibilityLabel="Apply filters">
+            Apply
+          </Button>
+        </View>
+      </Modal>
+    </Portal>
+  );
+}
+
 function BrewRow({ brew, rating }: { brew: Brew; rating: number | null }) {
   const beanName = brew.beanNameSnapshot ?? 'No bean';
   return (
@@ -210,13 +323,33 @@ const styles = StyleSheet.create({
   search: {
     marginBottom: 12,
   },
-  chips: {
-    gap: 8,
-    paddingBottom: 4,
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  chip: {
-    marginRight: 4,
+  count: {
+    marginLeft: 12,
+    opacity: 0.7,
+  },
+  modal: {
+  },
+  modalTitle: {
+    marginBottom: 12,
+  },
+  modalBody: {
+    maxHeight: 380,
+  },
+  sectionLabel: {
+    marginTop: 12,
+    marginBottom: 2,
+    opacity: 0.7,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginTop: 12,
   },
   dayHeader: {
     marginTop: 12,

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Switch, Text, TextInput } from 'react-native-paper';
-import type { Brewer, BrewerKind } from '../models';
+import type { BrewMethodId, Brewer, BrewerKind } from '../models';
 import { BREWER_KINDS } from '../models';
 import type { BrewerInput } from '../database/brewers';
+import { useAppData } from '../data/DataProvider';
 import { useAppTheme } from '../theme';
-import { BREWER_KIND_LABELS } from '../utils/labels';
+import { BREWER_KIND_LABELS, METHOD_LABELS } from '../utils/labels';
+import { methodsForKind } from '../services/equipment-service';
 import { KeyboardAwareScrollView } from './keyboard-aware-scroll-view';
 import { NumberField } from './number-field';
 import { OptionField } from './option-field';
@@ -29,8 +31,10 @@ export function BrewerForm({
   onSubmit,
 }: BrewerFormProps) {
   const theme = useAppTheme();
+  const { methods } = useAppData();
   const [name, setName] = useState(initial?.name ?? '');
   const [kind, setKind] = useState<BrewerKind>(initial?.kind ?? defaultKind);
+  const [methodId, setMethodId] = useState<BrewMethodId | null>(initial?.methodId ?? null);
   const [manufacturer, setManufacturer] = useState(initial?.manufacturer ?? '');
   const [model, setModel] = useState(initial?.model ?? '');
   const [capacityMl, setCapacityMl] = useState<number | null>(initial?.capacityMl ?? null);
@@ -38,6 +42,12 @@ export function BrewerForm({
   const [notes, setNotes] = useState(initial?.notes ?? '');
   const [isActive, setIsActive] = useState(initial?.isActive ?? true);
   const [error, setError] = useState<string | null>(null);
+
+  const kindMethods = methodsForKind(kind, methods);
+  const methodOptions = kindMethods.map((method) => ({
+    value: method.id,
+    label: METHOD_LABELS[method.id],
+  }));
 
   const handleSubmit = async () => {
     if (name.trim() === '') {
@@ -48,6 +58,7 @@ export function BrewerForm({
     await onSubmit({
       name: name.trim(),
       kind,
+      methodId,
       manufacturer: emptyToNull(manufacturer),
       model: emptyToNull(model),
       capacityMl,
@@ -75,10 +86,27 @@ export function BrewerForm({
           label="Kind"
           value={kind}
           options={KIND_OPTIONS}
-          onChange={(value) => setKind(value ?? defaultKind)}
+          onChange={(value) => {
+            const next = value ?? defaultKind;
+            setKind(next);
+            if (methodId !== null && !methodsForKind(next, methods).some((m) => m.id === methodId)) {
+              setMethodId(null);
+            }
+          }}
           nullable={false}
         />
       </View>
+      {methodOptions.length > 0 ? (
+        <View style={styles.field}>
+          <OptionField<BrewMethodId>
+            label="Brew method"
+            value={methodId}
+            options={methodOptions}
+            onChange={setMethodId}
+            emptyLabel="Not tied to a method"
+          />
+        </View>
+      ) : null}
       <TextInput
         label="Manufacturer"
         mode="outlined"

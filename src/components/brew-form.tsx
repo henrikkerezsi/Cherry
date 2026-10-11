@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Card, Divider, Text, TextInput } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { BrewMethodId, Brew, GrindUnit } from '../models';
-import { BREW_METHOD_IDS, GRIND_UNITS } from '../models';
+import { GRIND_UNITS } from '../models';
 import type { BrewInput } from '../database/brews';
 import { useAppData } from '../data/DataProvider';
 import { useAppTheme } from '../theme';
@@ -11,6 +11,7 @@ import { GRIND_UNIT_LABELS, METHOD_LABELS } from '../utils/labels';
 import { todayDate } from '../utils/date';
 import { beanNameSnapshot, derivedBrewDuration, brewRatio } from '../services/brew-service';
 import { checkHealthyRanges, formatRatio } from '../services/method-service';
+import { availableMethods, compatibleBrewers, methodById } from '../services/equipment-service';
 import { KeyboardAwareScrollView } from './keyboard-aware-scroll-view';
 import { DateField } from './date-field';
 import { NumberField } from './number-field';
@@ -25,10 +26,6 @@ interface BrewFormProps {
   onSubmit: (input: BrewInput) => Promise<void>;
 }
 
-const METHOD_OPTIONS = BREW_METHOD_IDS.map((value) => ({
-  value,
-  label: METHOD_LABELS[value],
-}));
 const GRIND_UNIT_OPTIONS = GRIND_UNITS.map((value) => ({
   value,
   label: GRIND_UNIT_LABELS[value],
@@ -36,10 +33,22 @@ const GRIND_UNIT_OPTIONS = GRIND_UNITS.map((value) => ({
 
 export function BrewForm({ initial, initialSteps, submitting, onSubmit }: BrewFormProps) {
   const theme = useAppTheme();
-  const { brewers, beans, grindSettings, settings } = useAppData();
+  const { brewers, beans, grindSettings, settings, methods } = useAppData();
+
+  const methodOptions = availableMethods(brewers, methods).map((method) => ({
+    value: method.id,
+    label: METHOD_LABELS[method.id],
+  }));
+  if (
+    initial?.methodId !== null &&
+    initial?.methodId !== undefined &&
+    !methodOptions.some((option) => option.value === initial.methodId)
+  ) {
+    methodOptions.push({ value: initial.methodId, label: METHOD_LABELS[initial.methodId] });
+  }
 
   const [methodId, setMethodId] = useState<BrewMethodId>(
-    initial?.methodId ?? settings.defaultMethodId ?? 'v60'
+    initial?.methodId ?? settings.defaultMethodId ?? availableMethods(brewers, methods)[0]?.id ?? 'v60'
   );
   const [brewDate, setBrewDate] = useState(initial?.brewDate ?? todayDate());
   const [beanId, setBeanId] = useState<number | null>(initial?.beanId ?? null);
@@ -63,7 +72,18 @@ export function BrewForm({ initial, initialSteps, submitting, onSubmit }: BrewFo
   const beanOptions = beans
     .filter((bean) => bean.isActive || bean.id === beanId)
     .map((bean) => ({ value: bean.id, label: bean.name }));
-  const brewerOptions = brewers.map((brewer) => ({ value: brewer.id, label: brewer.name }));
+  const brewerOptions = useMemo(() => {
+    const method = methodById(methodId, methods);
+    const compatible = method === null ? [] : compatibleBrewers(brewers, method);
+    const compatibleIds = new Set(compatible.map((brewer) => brewer.id));
+    const keepCurrent = brewers.filter(
+      (brewer) => brewer.id === brewerId && !compatibleIds.has(brewer.id)
+    );
+    return [...compatible, ...keepCurrent].map((brewer) => ({
+      value: brewer.id,
+      label: brewer.name,
+    }));
+  }, [brewers, methods, methodId, brewerId]);
   const grinderOptions = brewers
     .filter((brewer) => brewer.kind === 'grinder')
     .map((brewer) => ({ value: brewer.id, label: brewer.name }));
@@ -121,10 +141,33 @@ export function BrewForm({ initial, initialSteps, submitting, onSubmit }: BrewFo
       <OptionField<BrewMethodId>
         label="Method"
         value={methodId}
-        options={METHOD_OPTIONS}
-        onChange={(value) => setMethodId(value ?? 'v60')}
+        options={methodOptions}
+        onChange={(value) => {
+          const next = value ?? 'v60';
+          setMethodId(next);
+          setBrewerId((current) => {
+            if (current === null) {
+              return current;
+            }
+            const method = methodById(next, methods);
+            if (method === null) {
+              return current;
+            }
+            return compatibleBrewers(brewers, method).some((brewer) => brewer.id === current)
+              ? current
+              : null;
+          });
+        }}
         nullable={false}
       />
+      {brewers.length === 0 ? (
+        <Text
+          variant="bodySmall"
+          style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
+        >
+          No equipment yet — add some in the Equipment tab to narrow this list to what you own.
+        </Text>
+      ) : null}
       <View style={styles.field}>
         <DateField label="Brew date" value={brewDate} onChange={(value) => setBrewDate(value ?? todayDate())} />
       </View>

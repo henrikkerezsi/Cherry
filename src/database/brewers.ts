@@ -1,5 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-import type { Brewer, BrewerKind } from '../models';
+import type { BrewMethodId, Brewer, BrewerKind } from '../models';
 import { getDatabase } from './database';
 
 interface BrewerRow {
@@ -7,6 +7,7 @@ interface BrewerRow {
   uuid: string | null;
   name: string;
   kind: string;
+  method_id: string | null;
   manufacturer: string | null;
   model: string | null;
   capacity_ml: number | null;
@@ -25,6 +26,7 @@ function rowToBrewer(row: BrewerRow): Brewer {
     uuid: row.uuid,
     name: row.name,
     kind: row.kind as BrewerKind,
+    methodId: row.method_id as BrewMethodId | null,
     manufacturer: row.manufacturer,
     model: row.model,
     capacityMl: row.capacity_ml,
@@ -41,6 +43,7 @@ function rowToBrewer(row: BrewerRow): Brewer {
 export interface BrewerInput {
   name: string;
   kind: BrewerKind;
+  methodId: BrewMethodId | null;
   manufacturer: string | null;
   model: string | null;
   capacityMl: number | null;
@@ -90,11 +93,12 @@ export async function createBrewer(
 ): Promise<number> {
   const database = db ?? (await getDatabase());
   const result = await database.runAsync(
-    `INSERT INTO brewers (name, kind, manufacturer, model, capacity_ml, material, notes, is_active, sort_order)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO brewers (name, kind, method_id, manufacturer, model, capacity_ml, material, notes, is_active, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       input.name,
       input.kind,
+      input.methodId,
       input.manufacturer,
       input.model,
       input.capacityMl,
@@ -114,13 +118,14 @@ export async function updateBrewer(
 ): Promise<void> {
   const database = db ?? (await getDatabase());
   await database.runAsync(
-    `UPDATE brewers SET name = ?, kind = ?, manufacturer = ?, model = ?, capacity_ml = ?,
+    `UPDATE brewers SET name = ?, kind = ?, method_id = ?, manufacturer = ?, model = ?, capacity_ml = ?,
             material = ?, notes = ?, is_active = ?, sort_order = ?,
             updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
       WHERE id = ?`,
     [
       input.name,
       input.kind,
+      input.methodId,
       input.manufacturer,
       input.model,
       input.capacityMl,

@@ -10,8 +10,9 @@ import { EmptyState } from '../../components/empty-state';
 import { useAppData } from '../../data/DataProvider';
 import { useAppTheme } from '../../theme';
 import { BREWER_KINDS } from '../../models';
-import type { Brewer, BrewerKind } from '../../models';
-import { BREWER_KIND_LABELS } from '../../utils/labels';
+import type { Brewer, BrewerKind, Method } from '../../models';
+import { BREWER_KIND_LABELS, METHOD_LABELS } from '../../utils/labels';
+import { availableMethods } from '../../services/equipment-service';
 
 const KIND_ICONS: Record<BrewerKind, ComponentProps<typeof MaterialCommunityIcons>['name']> = {
   dripper: 'coffee-maker-outline',
@@ -34,9 +35,16 @@ function brewerDescription(brewer: Brewer): string {
   return parts.length > 0 ? parts.join(' · ') : BREWER_KIND_LABELS[brewer.kind];
 }
 
+function unlockLabel(missing: readonly Method[]): string {
+  if (missing.length <= 3) {
+    return missing.map((method) => METHOD_LABELS[method.id]).join(', ');
+  }
+  return `${missing.length} more methods`;
+}
+
 export default function EquipmentScreen() {
   const theme = useAppTheme();
-  const { brewers, grindSettings } = useAppData();
+  const { brewers, grindSettings, methods } = useAppData();
 
   const groups = useMemo(() => {
     const byKind = new Map<BrewerKind, Brewer[]>();
@@ -54,6 +62,15 @@ export default function EquipmentScreen() {
     }));
   }, [brewers]);
 
+  const { available, missing } = useMemo(() => {
+    const ready = brewers.length > 0 ? availableMethods(brewers, methods) : [];
+    const readyIds = new Set(ready.map((method) => method.id));
+    return {
+      available: ready,
+      missing: methods.filter((method) => !readyIds.has(method.id)),
+    };
+  }, [brewers, methods]);
+
   return (
     <ScreenFade>
       <Stack.Screen options={{ title: 'Equipment' }} />
@@ -69,6 +86,40 @@ export default function EquipmentScreen() {
         >
           Add equipment
         </Button>
+
+        {brewers.length > 0 ? (
+          <>
+            <Text variant="titleMedium" style={styles.brewReady}>
+              Ready to brew
+            </Text>
+            {available.length === methods.length ? (
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                Every brew method is unlocked with your equipment.
+              </Text>
+            ) : (
+              <>
+                {available.map((method) => (
+                  <List.Item
+                    key={method.id}
+                    title={METHOD_LABELS[method.id]}
+                    left={(props) => <List.Icon {...props} icon="coffee" />}
+                    right={(props) => <List.Icon {...props} icon="chevron-right" />}
+                    onPress={() => router.push(`/method/${method.id}`)}
+                  />
+                ))}
+                <Button
+                  mode="text"
+                  icon="plus"
+                  onPress={() => router.push('/brewer/new')}
+                  style={styles.unlockButton}
+                  testID="equipment-unlock"
+                >
+                  Add equipment to unlock {unlockLabel(missing)}
+                </Button>
+              </>
+            )}
+          </>
+        ) : null}
 
         {brewers.length === 0 ? (
           <EmptyState
@@ -146,9 +197,17 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 4,
   },
+  brewReady: {
+    marginTop: 16,
+    marginBottom: 4,
+  },
   subhead: {
     marginTop: 16,
     marginBottom: 4,
+  },
+  unlockButton: {
+    marginTop: 4,
+    alignSelf: 'flex-start',
   },
   addButton: {
     marginTop: 8,

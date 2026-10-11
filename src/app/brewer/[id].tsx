@@ -6,7 +6,7 @@ import { ScreenFade } from '../../components/screen-fade';
 import { KeyboardAwareScrollView } from '../../components/keyboard-aware-scroll-view';
 import { useAppData } from '../../data/DataProvider';
 import { useAppTheme } from '../../theme';
-import { BREWER_KIND_LABELS } from '../../utils/labels';
+import { BREWER_KIND_LABELS, METHOD_LABELS } from '../../utils/labels';
 
 export default function BrewerDetailScreen() {
   const theme = useAppTheme();
@@ -45,6 +45,14 @@ export default function BrewerDetailScreen() {
             </Text>
           </Card.Content>
         </Card>
+
+        {brewer.methodId !== null ? (
+          <List.Item
+            title="Brew method"
+            description={METHOD_LABELS[brewer.methodId]}
+            left={(props) => <List.Icon {...props} icon="coffee" />}
+          />
+        ) : null}
 
         <List.Item
           title="Manufacturer"

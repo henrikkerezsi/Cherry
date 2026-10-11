@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { Button, Divider, List, SegmentedButtons, Switch, Text } from 'react-native-paper';
@@ -8,19 +8,31 @@ import { NumberField } from '../../components/number-field';
 import { OptionField } from '../../components/option-field';
 import { useAppData } from '../../data/DataProvider';
 import { useAppTheme } from '../../theme';
-import { BREW_METHOD_IDS } from '../../models';
 import type { BrewMethodId, ThemeMode } from '../../models';
 import { releaseInfo } from '../../config/release-info';
 import { METHOD_LABELS } from '../../utils/labels';
-
-const METHOD_OPTIONS = BREW_METHOD_IDS.map((value) => ({
-  value,
-  label: METHOD_LABELS[value],
-}));
+import { availableMethods } from '../../services/equipment-service';
 
 export default function SettingsScreen() {
-  const { settings, aiState, roasters, saveSettings } = useAppData();
+  const { settings, aiState, roasters, brewers, methods, saveSettings } = useAppData();
   const theme = useAppTheme();
+
+  const methodOptions = useMemo(() => {
+    const options = availableMethods(brewers, methods).map((method) => ({
+      value: method.id,
+      label: METHOD_LABELS[method.id],
+    }));
+    if (
+      settings.defaultMethodId !== null &&
+      !options.some((option) => option.value === settings.defaultMethodId)
+    ) {
+      options.push({
+        value: settings.defaultMethodId,
+        label: METHOD_LABELS[settings.defaultMethodId],
+      });
+    }
+    return options;
+  }, [brewers, methods, settings.defaultMethodId]);
 
   return (
     <ScreenFade>
@@ -48,7 +60,7 @@ export default function SettingsScreen() {
         <OptionField<BrewMethodId>
           label="Default method"
           value={settings.defaultMethodId}
-          options={METHOD_OPTIONS}
+          options={methodOptions}
           onChange={(value) => saveSettings({ defaultMethodId: value })}
           emptyLabel="No default"
         />

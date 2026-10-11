@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Divider, Text, TextInput } from 'react-native-paper';
 import type { BrewMethodId, GrindUnit, Recipe } from '../models';
-import { BREW_METHOD_IDS, GRIND_UNITS } from '../models';
+import { GRIND_UNITS } from '../models';
 import type { RecipeInput, RecipeStepInput } from '../database/recipes';
 import { useAppData } from '../data/DataProvider';
 import { useAppTheme } from '../theme';
 import { GRIND_UNIT_LABELS, METHOD_LABELS } from '../utils/labels';
+import { availableMethods, compatibleBrewers, methodById } from '../services/equipment-service';
 import { KeyboardAwareScrollView } from './keyboard-aware-scroll-view';
 import { NumberField } from './number-field';
 import { OptionField } from './option-field';
@@ -19,10 +20,6 @@ interface RecipeFormProps {
   onSubmit: (input: RecipeInput) => Promise<void>;
 }
 
-const METHOD_OPTIONS = BREW_METHOD_IDS.map((value) => ({
-  value,
-  label: METHOD_LABELS[value],
-}));
 const GRIND_UNIT_OPTIONS = GRIND_UNITS.map((value) => ({
   value,
   label: GRIND_UNIT_LABELS[value],
@@ -35,11 +32,23 @@ export function RecipeForm({
   onSubmit,
 }: RecipeFormProps) {
   const theme = useAppTheme();
-  const { brewers, beans, grindSettings } = useAppData();
+  const { brewers, beans, grindSettings, methods } = useAppData();
+
+  const methodOptions = availableMethods(brewers, methods).map((method) => ({
+    value: method.id,
+    label: METHOD_LABELS[method.id],
+  }));
+  if (
+    initial?.methodId !== null &&
+    initial?.methodId !== undefined &&
+    !methodOptions.some((option) => option.value === initial.methodId)
+  ) {
+    methodOptions.push({ value: initial.methodId, label: METHOD_LABELS[initial.methodId] });
+  }
 
   const [name, setName] = useState(initial?.name ?? '');
   const [methodId, setMethodId] = useState<BrewMethodId>(
-    initial?.methodId ?? 'v60'
+    initial?.methodId ?? availableMethods(brewers, methods)[0]?.id ?? 'v60'
   );
   const [brewerId, setBrewerId] = useState<number | null>(initial?.brewerId ?? null);
   const [beanId, setBeanId] = useState<number | null>(initial?.beanId ?? null);
@@ -65,10 +74,18 @@ export function RecipeForm({
   const [steps, setSteps] = useState<RecipeStepInput[]>(initialSteps);
   const [error, setError] = useState<string | null>(null);
 
-  const brewerOptions = brewers.map((brewer) => ({
-    value: brewer.id,
-    label: brewer.name,
-  }));
+  const brewerOptions = useMemo(() => {
+    const method = methodById(methodId, methods);
+    const compatible = method === null ? [] : compatibleBrewers(brewers, method);
+    const compatibleIds = new Set(compatible.map((brewer) => brewer.id));
+    const keepCurrent = brewers.filter(
+      (brewer) => brewer.id === brewerId && !compatibleIds.has(brewer.id)
+    );
+    return [...compatible, ...keepCurrent].map((brewer) => ({
+      value: brewer.id,
+      label: brewer.name,
+    }));
+  }, [brewers, methods, methodId, brewerId]);
   const beanOptions = beans.map((bean) => ({ value: bean.id, label: bean.name }));
   const grinderOptions = brewers
     .filter((brewer) => brewer.kind === 'grinder')
@@ -124,8 +141,23 @@ export function RecipeForm({
         <OptionField<BrewMethodId>
           label="Method"
           value={methodId}
-          options={METHOD_OPTIONS}
-          onChange={(value) => setMethodId(value ?? 'v60')}
+          options={methodOptions}
+          onChange={(value) => {
+            const next = value ?? 'v60';
+            setMethodId(next);
+            setBrewerId((current) => {
+              if (current === null) {
+                return current;
+              }
+              const method = methodById(next, methods);
+              if (method === null) {
+                return current;
+              }
+              return compatibleBrewers(brewers, method).some((brewer) => brewer.id === current)
+                ? current
+                : null;
+            });
+          }}
           nullable={false}
         />
       </View>

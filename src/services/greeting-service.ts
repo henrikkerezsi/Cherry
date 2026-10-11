@@ -159,14 +159,14 @@ const GREETINGS: readonly DailyGreeting[] = [
 
 export const GREETING_COUNT = GREETINGS.length;
 
-function hashDate(date: string): number {
-  let hash = 0;
-  for (let i = 0; i < date.length; i++) {
-    hash = (hash * 31 + date.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash);
-}
-
 export function greetingForDay(date: string): DailyGreeting {
-  return GREETINGS[hashDate(date) % GREETINGS.length];
+  const parsed = new Date(`${date}T12:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) {
+    return GREETINGS[0];
+  }
+  const dayOfYear = Math.floor(
+    (parsed.getTime() - Date.UTC(parsed.getUTCFullYear(), 0, 0)) / 86_400_000
+  );
+  const seed = parsed.getUTCFullYear() * 366 + dayOfYear;
+  return GREETINGS[seed % GREETINGS.length];
 }

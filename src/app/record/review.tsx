@@ -20,6 +20,7 @@ import { RatingSelector } from '../../components/rating-selector';
 import type { TasteRating } from '../../components/rating-selector';
 import { NumberField } from '../../components/number-field';
 import { useAppData } from '../../data/DataProvider';
+import { availableMethods } from '../../services/equipment-service';
 import { useAppTheme } from '../../theme';
 import {
   ATTRIBUTE_LEVELS,
@@ -172,6 +173,11 @@ export default function ReviewScreen() {
   const [activeRun, setActiveRun] = useState<ExtractionRun | null>(null);
   const [questions, setQuestions] = useState<ExtractionQuestion[]>([]);
   const [edits, setEdits] = useState<Edits | null>(null);
+
+  const availableMethodIds = useMemo(
+    () => availableMethods(brewers, methods).map((method) => method.id),
+    [brewers, methods]
+  );
   const [answerDrafts, setAnswerDrafts] = useState<Record<number, string>>({});
   const [transcriptDraft, setTranscriptDraft] = useState('');
   const [busy, setBusy] = useState(false);
@@ -796,7 +802,9 @@ export default function ReviewScreen() {
               <Card.Content>
                 <Text variant="labelMedium">Method</Text>
                 <View style={styles.chipRow}>
-                  {BREW_METHOD_IDS.map((id) => {
+                  {BREW_METHOD_IDS.filter(
+                    (id) => availableMethodIds.includes(id) || id === edits?.methodId
+                  ).map((id) => {
                     const method = methods.find((m) => m.id === id);
                     return (
                       <Chip

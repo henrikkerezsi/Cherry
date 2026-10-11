@@ -291,6 +291,7 @@ export interface Brewer {
   uuid: string | null;
   name: string;
   kind: BrewerKind;
+  methodId: BrewMethodId | null;
   manufacturer: string | null;
   model: string | null;
   capacityMl: number | null;
